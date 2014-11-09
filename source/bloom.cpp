@@ -5,6 +5,8 @@
 #include <vector>
 using namespace std;
 
+#include <boost/filesystem.hpp>
+
 #include "settings.h"
 #include "renderstate_manager_dx9.h"
 #include "utils.h"
@@ -18,27 +20,16 @@ Bloom::Bloom(IDirect3DDevice9 *device, int width, int height, float cutoff, floa
 	  steps(0),
 	  dumping(false) {
 	
-	// Setup the defines for compiling the effect
-    vector<D3DXMACRO> defines;
-	//string cutoffText = format("%lf", cutoff);
-	//D3DXMACRO cutoffMacro = { "CUTOFF", cutoffText.c_str() };
-	//defines.push_back(cutoffMacro);
-	//string strengthText = format("%lf", strength);
-	//D3DXMACRO strengthMacro = { "STRENGTH", strengthText.c_str() };
-	//defines.push_back(strengthMacro);
-	//string dirtStrengthText = format("%lf", dirtStrength);
-	//D3DXMACRO dirtStrengthMacro = { "DIRT_STRENGTH", dirtStrengthText.c_str() };
-	//defines.push_back(dirtStrengthMacro);	
-    D3DXMACRO null = { NULL, NULL };
-    defines.push_back(null);
-
 	DWORD flags = D3DXFX_NOT_CLONEABLE | D3DXSHADER_OPTIMIZATION_LEVEL3;
 
 	// Load effect from file
-	string shaderFn = getAssetFileName("bloom.fx");
+	string shaderFn;
+	string customfn = getConfigFileName(getExeFileName() + "\\bloom.fx");
+	if(boost::filesystem::exists(customfn)) shaderFn = customfn;
+	else shaderFn = getAssetFileName(shaderFn);
 	SDLOG(0, "%s load\n", shaderFn.c_str());
 	ID3DXBuffer* errors;
-	HRESULT hr = D3DXCreateEffectFromFile(device, shaderFn.c_str(), &defines.front(), NULL, flags, NULL, &effect, &errors);
+	HRESULT hr = D3DXCreateEffectFromFile(device, shaderFn.c_str(), NULL, NULL, flags, NULL, &effect, &errors);
 	if(hr != D3D_OK) SDLOG(-1, "ERRORS compiling bloom.fx:\n %s\n", errors->GetBufferPointer());
 	
 	// Load texture

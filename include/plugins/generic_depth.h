@@ -17,8 +17,6 @@ class GenericDepthPlugin : public GenericPlugin {
 	double drwP, aspectHeightP;
 	std::unique_ptr<DepthTexture> depthTexture, depthTextureAlt;
 
-	virtual void process(IDirect3DSurface9* backBuffer) override;
-
 public:
 	GenericDepthPlugin(IDirect3DDevice9* device, RSManagerDX9 &manager) : GenericPlugin(device, manager)
 	{ }
@@ -27,6 +25,8 @@ public:
 
 	virtual void initialize(unsigned rw, unsigned rh, D3DFORMAT bbformat, D3DFORMAT dssformat) override;
 	virtual void reportStatus() override;
+
+	virtual void process(IDirect3DSurface9* backBuffer) override;
 
 	virtual HRESULT redirectBeginScene() override;
 	virtual HRESULT redirectClear(DWORD Count, CONST D3DRECT *pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil) override;
